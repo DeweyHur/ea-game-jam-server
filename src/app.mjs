@@ -2,13 +2,14 @@ import express from 'express';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import db from './db.mjs';
+
+import registerProjectsRoutes from './routes/project.mjs';
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'SPASeeker',
+  secret: 'ea-game-jam',
   resave: false,
   saveUninitialized: true
 }));
@@ -18,10 +19,10 @@ app.use((req, res, next) => {
   next(null, req, res);
 });
 
-(async () => {
-  db.connect();
+registerProjectsRoutes('/project', app);
 
-  const { listeningUri, PORT = 14141 } = process.env;
+(async () => {  
+  const { listeningUri = "localhost", PORT = 14141 } = process.env;
   app.listen(PORT, () => {
     console.log(`Listening from ${listeningUri}:${PORT}`);
   });
