@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -8,6 +9,7 @@ import registerProjectsRoutes from './routes/project.mjs';
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 app.use(session({
   secret: 'ea-game-jam',
   resave: false,
