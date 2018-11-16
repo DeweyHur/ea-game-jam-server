@@ -17,11 +17,11 @@ const getUserImpl = async alias => {
 
 const loginImpl = async (req, res, next) => {
   return passport.authenticate("local", (err, user, info) => {
-    req.login(user, err => {
+    req.login((user, err) => {
       return res.send(user).status(200);
     });
   })(req, res, next);
-}
+};
 
 const routers = {
   "/:alias": {
@@ -48,7 +48,7 @@ const routers = {
   "/logout": {
     post: async (req, res) => {
       req.logout();
-      return res.send(user).status(200);
+      return res.status(200);
     }
   }
 };
@@ -61,7 +61,6 @@ export function initPassport(app) {
         passwordField: "password"
       },
       (alias, password, done) => {
-        console.log(`alias - ${alias}, password - ${password}`);
         (async () => {
           try {
             const user = await login(alias, password);
@@ -75,12 +74,15 @@ export function initPassport(app) {
   );
 
   passport.serializeUser((user, done) => {
-    console.dir(user);
-    console.log(
-      "Inside serializeUser callback. User id is save to the session file store here"
-    );
+    console.log("serializing", user.alias);
     done(null, user.alias);
   });
+
+  passport.deserializeUser(async (alias, done) => {
+    console.log("deserializing", alias);
+    const user = await getUserImpl(alias);
+    done(null, user);
+  })
 
   app.use(passport.initialize());
   app.use(passport.session());

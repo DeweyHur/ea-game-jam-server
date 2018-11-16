@@ -12,14 +12,14 @@ export async function getProject(id) {
   return await dao().findOne({ id });
 }
 
-export async function putLike(id, alias) {
-  return await dao().updateOne({ id }, {
-    $addToSet: { likes: alias }
+export async function putLike(projectid, userid) {
+  return await dao().updateOne({ id: projectid }, {
+    $addToSet: { likes: userid }
   });
 }
 
-export async function deleteLike(id, alias) {
-  return await dao().updateOne({ id }, {
-    $pop: { likes: alias }
+export async function deleteLike(projectid, userid) {
+  return await dao().updateOne({ id: projectid }, {
+    $pop: { likes: userid }
   });
 }
