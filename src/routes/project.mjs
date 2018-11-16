@@ -1,41 +1,46 @@
-import _ from 'lodash';
-import { resError } from './util.mjs';
-import { getProjects, getProject, putLike, deleteLike } from '../dao/project.mjs';
+import _ from "lodash";
+import { resError } from "./util.mjs";
+import {
+  getProjects,
+  getProject,
+  putLike,
+  deleteLike
+} from "../dao/project.mjs";
 
 export const routes = {
   "": {
-    "get": (async (req, res) => {
+    get: async (req, res) => {
       const projects = await getProjects();
       console.dir(projects);
       return res.send(projects).status(200);
-    })
+    }
   },
   "/:id": {
-    "get": (async (req, res) => {
+    get: async (req, res) => {
       const { id } = req.params;
       const project = await getProject(id);
       console.dir(project);
       return res.send(project).status(200);
-    })
+    }
   },
   "/:id/like": {
-    "put": (async (req, res) => {
+    put: async (req, res) => {
       const { id } = req.params;
       const { alias } = req.user;
       await putLike(id, alias);
-      
+
       const project = await getProject(id);
       console.dir(project);
       return res.send(project).status(200);
-    }),
-    "delete": (async (req, res) => {
+    },
+    delete: async (req, res) => {
       const { id } = req.params;
       const { alias } = req.user;
       await deleteLike(id, alias);
-      
+
       const project = await getProject(id);
       console.dir(project);
       return res.send(project).status(200);
-    })
+    }
   }
-}
+};

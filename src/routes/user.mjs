@@ -17,7 +17,15 @@ const getUserImpl = async alias => {
 const loginImpl = async (req, res, next) => {
   return passport.authenticate("local", (err, user, info) => {
     req.login(user, err => {
-      if (err) { throw { status: 500, text: 'Login Error' } }      
+      if (err) {
+        throw { status: 500, text: "Login Error" };
+      }
+      req.session.user = user;
+      req.session.save(err => {
+        if (err) {
+          throw { status: 500, text: JSON.stringify(err) };
+        }
+      });
       return res.send(user).status(200);
     });
   })(req, res, next);
