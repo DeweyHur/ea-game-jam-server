@@ -1,5 +1,4 @@
 import _ from "lodash";
-import express from "express";
 import passport from "passport";
 import passportLocal from "passport-local";
 import { resError } from "./util.mjs";
@@ -10,20 +9,21 @@ const Strategy = passportLocal.Strategy;
 const getUserImpl = async alias => {
   const user = await getUser(alias);
   if (!user) {
-    throw `User ${alias} not found`;
+    throw { status: 401, text: `User ${alias} not found` };
   }
   return user;
 };
 
 const loginImpl = async (req, res, next) => {
   return passport.authenticate("local", (err, user, info) => {
-    req.login((user, err) => {
+    req.login(user, err => {
+      if (err) { throw { status: 500, text: 'Login Error' } }      
       return res.send(user).status(200);
     });
   })(req, res, next);
 };
 
-const routers = {
+export const routes = {
   "/:alias": {
     get: async (req, res) => {
       const { alias } = req.params;
@@ -34,7 +34,7 @@ const routers = {
       const { alias } = req.params;
       const user = await getUser(alias);
       if (user) {
-        return resError(res, 401, `User ${alias} is already found`);
+        throw { status: 401, text: `User ${alias} is already found` };
       }
 
       const { name, password } = req.body;
@@ -54,6 +54,9 @@ const routers = {
 };
 
 export function initPassport(app) {
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   passport.use(
     new Strategy(
       {
@@ -82,32 +85,5 @@ export function initPassport(app) {
     console.log("deserializing", alias);
     const user = await getUserImpl(alias);
     done(null, user);
-  })
-
-  app.use(passport.initialize());
-  app.use(passport.session());
-}
-
-export function initRoutes(resource, app) {
-  const router = express.Router();
-  _.forEach(routers, (apis, verb) =>
-    _.forEach(apis, (func, method) => {
-      const wrapper = (req, res, next) => {
-        try {
-          return func(req, res, next);
-        } catch (e) {
-          return resError(res, 500, e);
-        }
-      };
-      return router[method](verb, wrapper);
-    })
-  );
-  app.use(resource, router);
-  console.log(
-    "Listen",
-    _.flatMap(
-      routers,
-      (apis, verb) => `${_.keys(apis).join("/")} ${resource}${verb}`
-    )
-  );
+  });
 }
