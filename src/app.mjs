@@ -4,8 +4,8 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
+import { initPassport, initRoutes } from './routes/user.mjs';
 import registerProjectsRoutes from './routes/project.mjs';
-import registerUsersRoutes from './routes/user.mjs';
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,8 +22,9 @@ app.use((req, res, next) => {
   next(null, req, res);
 });
 
+initPassport(app);
+initRoutes('/user', app);
 registerProjectsRoutes('/project', app);
-registerUsersRoutes('/user', app);
 
 (async () => {  
   const { listeningUri = "localhost", PORT = 14141 } = process.env;
