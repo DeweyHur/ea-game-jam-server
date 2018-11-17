@@ -27,7 +27,8 @@ export const routes = {
     put: async (req, res) => {
       const { id } = req.params;
       const { alias } = req.user;
-      await putLike(id, alias);
+      const result = await putLike(id, alias);
+      console.dir(result.result);
 
       const project = await getProject(id);
       console.dir(project);
@@ -36,7 +37,8 @@ export const routes = {
     delete: async (req, res) => {
       const { id } = req.params;
       const { alias } = req.user;
-      await deleteLike(id, alias);
+      const result = await deleteLike(id, alias);
+      console.dir(result.result);
 
       const project = await getProject(id);
       console.dir(project);

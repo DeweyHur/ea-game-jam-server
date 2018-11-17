@@ -23,12 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 initPassport(app);
 
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} ${JSON.stringify(req.body)}`);
-  console.log(
-    `Session ID ${req.sessionID}, Stores ${_.keys(
-      req.sessionStore.sessions
-    ).join(",")}`
-  );
+  console.log(`${req.method} ${req.url} ${req.user ? req.user.alias : ""} ${JSON.stringify(req.params)} ${JSON.stringify(req.body)}`);
   next(null, req, res);
 });
 
