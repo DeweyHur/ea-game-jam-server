@@ -1,7 +1,6 @@
 import _ from "lodash";
 import passport from "passport";
 import passportLocal from "passport-local";
-import { resError } from "./util.mjs";
 import { login, getUser, putUser } from "../dao/user.mjs";
 
 const Strategy = passportLocal.Strategy;
@@ -38,7 +37,7 @@ export const routes = {
       const user = await getUserImpl(alias);
       return res.send(user).status(200);
     },
-    put: async (req, res) => {
+    put: async (req, res, next) => {
       const { alias } = req.params;
       const user = await getUser(alias);
       if (user) {
@@ -47,7 +46,8 @@ export const routes = {
 
       const { name, password } = req.body;
       await putUser(alias, name, password);
-      return await loginImpl(req, res, next);
+      const newUser = await getUserImpl(alias);
+      return res.send(newUser).status(200);
     }
   },
   "/login": {
