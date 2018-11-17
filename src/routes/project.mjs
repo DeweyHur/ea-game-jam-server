@@ -1,11 +1,12 @@
 import _ from "lodash";
-import { resError } from "./util.mjs";
 import {
   getProjects,
   getProject,
   putLike,
   deleteLike
 } from "../dao/project.mjs";
+import { getComments } from "../dao/comment.mjs";
+import { putComment } from "../dao/comment.mjs";
 
 export const routes = {
   "": {
@@ -44,5 +45,20 @@ export const routes = {
       console.dir(project);
       return res.send(project).status(200);
     }
+  },
+  "/:id/comment": {
+    get: async (req, res) => {
+      const { id } = req.params;
+      const comments = await getComments(id);
+      console.dir(comments);
+      return res.send(comments).status(200);
+    },
+    put: async (req, res) => {
+      const { id } = req.params;
+      const { text } = req.body;
+      const { alias } = req.user;
+      await putComment(id, alias, text);      
+      return res.send(await getComments(id)).status(200);
+    }    
   }
 };
