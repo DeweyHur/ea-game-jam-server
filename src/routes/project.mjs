@@ -7,6 +7,7 @@ import {
 } from "../dao/project.mjs";
 import { getComments } from "../dao/comment.mjs";
 import { putComment } from "../dao/comment.mjs";
+import { deleteComment } from "../dao/comment.mjs";
 
 export const routes = {
   "": {
@@ -59,6 +60,12 @@ export const routes = {
       const { alias } = req.user;
       await putComment(id, alias, text);      
       return res.send(await getComments(id)).status(200);
-    }    
+    },
+    delete: async (req, res) => {
+      const { id } = req.params;
+      const { alias } = req.user;
+      await deleteComment(id, alias);
+      return res.send(await getComments(id)).status(200);
+    }
   }
 };

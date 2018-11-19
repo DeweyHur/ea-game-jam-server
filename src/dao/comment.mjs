@@ -11,5 +11,9 @@ export async function getComments(postid) {
 }
 
 export async function putComment(postid, name, text) {
-  return await dao().insertOne({ postid: ObjectID(postid), name, text });
+  return await dao().insertOne({ postid: ObjectID(postid), name, text, timestamp: new Date() });
+}
+
+export async function deleteComment(postid, name) {  
+  return await dao().deleteOne({ postid: ObjectID(postid), name });
 }
