@@ -8,6 +8,8 @@ import {
 import { getComments } from "../dao/comment.mjs";
 import { putComment } from "../dao/comment.mjs";
 import { deleteComment } from "../dao/comment.mjs";
+import { putVote } from "../dao/vote.mjs";
+import { getVotesByUser } from "../dao/vote.mjs";
 
 export const routes = {
   "": {
@@ -19,7 +21,7 @@ export const routes = {
   },
   "/:id": {
     get: async (req, res) => {
-      const { id } = req.params;
+      const { id } = req.params;      
       const project = await getProject(id);
       console.dir(project);
       return res.send(project).status(200);
@@ -66,6 +68,20 @@ export const routes = {
       const { alias } = req.user;
       await deleteComment(id, alias);
       return res.send(await getComments(id)).status(200);
+    }
+  },
+  "/:id/vote": {
+    put: async (req, res) => {
+      const { id } = req.params;
+      const { alias } = req.user;
+      await putVote(id, alias);      
+      return res.send(await getVotesByUser(alias)).status(200);
+    },
+    delete: async (req, res) => {
+      const { id } = req.params;
+      const { alias } = req.user;
+      await deleteVote(id, alias);      
+      return res.send(await getVotesByUser(alias)).status(200);      
     }
   }
 };

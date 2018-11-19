@@ -18,5 +18,5 @@ export async function login(alias, password) {
 }
 
 export async function putUser(alias, name, password) {
-  return await dao().insertOne({ alias, name, password });
+  return await dao().insertOne({ alias, name, password, votes: [] });
 }
