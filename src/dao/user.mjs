@@ -5,7 +5,12 @@ function dao() {
 }
 
 export async function getUser(alias) {
-  return await dao().findOne({ alias });
+  if (Array.isArray(alias)) {
+    const users = await dao().find({ "alias": { "$in": alias } }).toArray();
+    return Array.from(users);
+  } else {
+    return await dao().findOne({ alias });
+  }
 }
 
 export async function login(alias, password) {

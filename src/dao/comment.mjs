@@ -10,10 +10,10 @@ export async function getComments(postid) {
   return await dao().find({ postid: ObjectID(postid) }).toArray();
 }
 
-export async function putComment(postid, name, text) {
-  return await dao().insertOne({ postid: ObjectID(postid), name, text, timestamp: new Date() });
+export async function putComment(postid, alias, text) {
+  return await dao().insertOne({ postid: ObjectID(postid), alias, text, timestamp: new Date() });
 }
 
-export async function deleteComment(id, name) {  
-  return await dao().deleteOne({ _id: ObjectID(id), name });
+export async function deleteComment(id, alias) {  
+  return await dao().deleteOne({ _id: ObjectID(id), alias });
 }
