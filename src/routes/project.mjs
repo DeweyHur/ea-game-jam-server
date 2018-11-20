@@ -19,20 +19,30 @@ async function getExtendedComments(id) {
   return comments.map(comment => ({ ...comment, name: userMap[comment.alias].name }));
 }
 
+async function extendProject(project) {
+  const users = await getUser(project.likes);
+  const userMap = _.keyBy(users, 'alias');
+  project.likes = project.likes.map(alias => ({ alias, name: userMap[alias].name }));
+  return project;  
+}
+
+async function getExtendedProject(id) {
+  const project = await getProject(id);
+  return await extendProject(project);
+}
+
 export const routes = {
   "": {
     get: async (req, res) => {
       const projects = await getProjects();
-      console.dir(projects);
-      return res.send(projects).status(200);
+      const extendedProjects = await Promise.all(projects.map(extendProject));
+      return res.send(extendedProjects).status(200);
     }
   },
   "/:id": {
     get: async (req, res) => {
       const { id } = req.params;      
-      const project = await getProject(id);
-      console.dir(project);
-      return res.send(project).status(200);
+      return res.send(await getExtendedProject(id)).status(200);
     }
   },
   "/:id/like": {
@@ -41,16 +51,14 @@ export const routes = {
       const { alias } = req.user;
       const result = await putLike(id, alias);
       console.dir(result.result);
-      const project = await getProject(id);
-      return res.send(project).status(200);
+      return res.send(await getExtendedProject(id)).status(200);
     },
     delete: async (req, res) => {
       const { id } = req.params;
       const { alias } = req.user;
       const result = await deleteLike(id, alias);
       console.dir(result.result);
-      const project = await getProject(id);
-      return res.send(project).status(200);
+      return res.send(await getExtendedProject(id)).status(200);
     }
   },
   "/:id/comment/:commentid": {
