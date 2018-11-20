@@ -49,6 +49,14 @@ export const routes = {
       return res.send(project).status(200);
     }
   },
+  "/:id/comment/:commentid": {
+    delete: async (req, res) => {
+      const { id, commentid } = req.params;
+      const { alias } = req.user;
+      await deleteComment(commentid, alias);
+      return res.send(await getComments(id)).status(200);
+    }
+  },
   "/:id/comment": {
     get: async (req, res) => {
       const { id } = req.params;
@@ -61,12 +69,6 @@ export const routes = {
       const { text } = req.body;
       const { alias } = req.user;
       await putComment(id, alias, text);      
-      return res.send(await getComments(id)).status(200);
-    },
-    delete: async (req, res) => {
-      const { id } = req.params;
-      const { alias } = req.user;
-      await deleteComment(id, alias);
       return res.send(await getComments(id)).status(200);
     }
   },
