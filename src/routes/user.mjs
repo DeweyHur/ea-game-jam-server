@@ -2,6 +2,7 @@ import _ from "lodash";
 import passport from "passport";
 import passportLocal from "passport-local";
 import { login, getUser, putUser } from "../dao/user.mjs";
+import { getVotesByUser } from "../dao/vote.mjs";
 
 const Strategy = passportLocal.Strategy;
 
@@ -19,13 +20,10 @@ const loginImpl = async (req, res, next) => {
       if (err) {
         throw { status: 500, text: "Login Error" };
       }
-      req.session.user = user;
-      req.session.save(err => {
-        if (err) {
-          throw { status: 500, text: JSON.stringify(err) };
-        }
-      });
-      return res.send(user).status(200);
+      (async () => {
+        const votes = await getVotesByUser(user.alias);
+        return res.send({ ...user, votes }).status(200);
+      })();
     });
   })(req, res, next);
 };
@@ -92,6 +90,7 @@ export function initPassport(app) {
   passport.deserializeUser(async (alias, done) => {
     console.log("deserializing", alias);
     const user = await getUserImpl(alias);
-    done(null, user);
+    const votes = await getVotesByUser(alias);
+    done(null, { ...user, votes });
   });
 }
